@@ -213,7 +213,7 @@ MonoBehaviour:
   scoreOneLine: 40
   ScoreTwoLine: 100
   ScoreThreeLine: 300
-  ScoreFourLine: 800
+  ScoreFourLine: 900
   hud_score: {fileID: 527526064}
   clearedLinesSound: {fileID: 8300000, guid: d9b52aa24c6791c4693df18de2982c28, type: 3}
 --- !u!4 &700357759
