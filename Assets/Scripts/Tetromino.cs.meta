@@ -1,10 +1,13 @@
 fileFormatVersion: 2
 guid: 77617e9a7341df744834eb715e03e741
-timeCreated: 1494749728
+timeCreated: 1496097354
 licenseType: Free
 MonoImporter:
   serializedVersion: 2
-  defaultReferences: []
+  defaultReferences:
+  - moveSound: {instanceID: 0}
+  - rotateSound: {instanceID: 0}
+  - landSound: {instanceID: 0}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 
