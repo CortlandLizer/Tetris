@@ -5,6 +5,9 @@ TagManager:
   serializedVersion: 2
   tags:
   - Game
+  - UI
+  - currentActiveTetromino
+  - currentSavedTetromino
   layers:
   - Default
   - TransparentFX
@@ -39,8 +42,14 @@ TagManager:
   - 
   - 
   m_SortingLayers:
+  - name: Background
+    uniqueID: 3142611005
+    locked: 0
   - name: Default
     uniqueID: 0
+    locked: 0
+  - name: UI
+    uniqueID: 3997170977
     locked: 0
   - name: Game
     uniqueID: 2882721323
