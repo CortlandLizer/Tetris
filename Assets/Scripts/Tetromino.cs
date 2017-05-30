@@ -9,300 +9,306 @@ using UnityEngine;
 public class Tetromino : MonoBehaviour {
 
 
-	float Fall = 0;
-	private float FallSpeed; //see public fallSpeed
-	public bool allowRotation = true;
-	public bool limitRotation = false;
+    float Fall = 0;
+    private float FallSpeed; //see public fallSpeed
+    public bool allowRotation = true;
+    public bool limitRotation = false;
 
 
 
-	public AudioClip moveSound;
-	public AudioClip rotateSound;
-	public AudioClip landSound;
+    public AudioClip moveSound;
+    public AudioClip rotateSound;
+    public AudioClip landSound;
 
 
-	public float continuousVerticalSpeed = 0.05f;  //speed to move when down arrow i pressed
-	public float continuousHorizontalSpeed = 0.1f; // speed hat left or right moves        0.1f is default make smaller for faster (.01 is to fast .05 is to slow) [BEST RANGE][   ]
-	public float buttonDownWaitMax = 0.2f; // how long to wait before tetrimion recognizes butto is held 
+    public float continuousVerticalSpeed = 0.05f;  //speed to move when down arrow i pressed
+    public float continuousHorizontalSpeed = 0.1f; // speed hat left or right moves        0.1f is default make smaller for faster (.01 is to fast .05 is to slow) [BEST RANGE][   ]
+    public float buttonDownWaitMax = 0.2f; // how long to wait before tetrimion recognizes butto is held 
 
-	public float buttonDownWaitTimerHorizontal = 0; //probably shoul be private b/c there is no reason to change this ...also it cant really be changed
-	public float buttonDownWaitTimerVirtical = 0; //probably shoul be private b/c there is no reason to change this ...also it cant really be changed
+    public float buttonDownWaitTimerHorizontal = 0; //probably shoul be private b/c there is no reason to change this ...also it cant really be changed
+    public float buttonDownWaitTimerVirtical = 0; //probably shoul be private b/c there is no reason to change this ...also it cant really be changed
 
 
-	private bool movedImmediateHorizontal = false;
-	private bool movedImmediateVertical = false;
+    private bool movedImmediateHorizontal = false;
+    private bool movedImmediateVertical = false;
 
-	private float verticalTimer = 0;
-	private float horizonalTimer = 0;
+    private float verticalTimer = 0;
+    private float horizonalTimer = 0;
 
-	public int individualScore = 100;
-	public float individualScoreTime;
+    public int individualScore = 100;
+    public float individualScoreTime;
 
-	private AudioSource audioSource;
-	// Use this for initialization
-	void Start() {
+    private AudioSource audioSource;
+    // Use this for initialization
+    void Start() {
 
-		audioSource = GetComponent<AudioSource>();
+        audioSource = GetComponent<AudioSource>();
 
-		FallSpeed = GameObject.Find("GameScript").GetComponent<Game>().fallSpeed; //this might be a good way to change controls in a menu 
-	}
+        //FallSpeed = GameObject.Find("GameScript").GetComponent<Game>().fallSpeed; //this might be a good way to change controls in a menu 
+    }
 
-	// Update is called once per frame
-	void Update() {
+    // Update is called once per frame
+    void Update() {
 
-		CheckUserInput();
-		UpdateIndividualScore();
-	}
+        UpdateFallSpeed();
 
-	void UpdateIndividualScore() {
+        CheckUserInput();
+        UpdateIndividualScore();
+    }
+    void UpdateFallSpeed() {
 
-		if (individualScoreTime < 1) {
+        FallSpeed = Game.fallSpeed;
+    }
 
-			individualScoreTime += Time.deltaTime;
+    void UpdateIndividualScore() {
 
-		}
-		else {
+        if (individualScoreTime < 1) {
 
-			individualScoreTime = 0;
+            individualScoreTime += Time.deltaTime;
 
-			individualScore = Mathf.Max(individualScore - 10, 0);
-		}
-	}
+        }
+        else {
 
-	void CheckUserInput() {
-		bool right = Input.GetKey(KeyCode.RightArrow);
-		bool left = Input.GetKey(KeyCode.LeftArrow);
-		bool down = Input.GetKey(KeyCode.DownArrow);
-		bool up = Input.GetKeyDown(KeyCode.UpArrow);
-		bool rotate = Input.GetKeyDown(KeyCode.Space);
+            individualScoreTime = 0;
 
-		if (Input.GetKeyUp(KeyCode.RightArrow) || Input.GetKeyUp(KeyCode.LeftArrow)) {
+            individualScore = Mathf.Max(individualScore - 10, 0);
+        }
+    }
 
-			movedImmediateHorizontal = false;
-			horizonalTimer = 0;
-			buttonDownWaitTimerHorizontal = 0;			
-		}
+    void CheckUserInput() {
+        bool right = Input.GetKey(KeyCode.RightArrow);
+        bool left = Input.GetKey(KeyCode.LeftArrow);
+        bool down = Input.GetKey(KeyCode.DownArrow);
+        bool up = Input.GetKeyDown(KeyCode.UpArrow);
+        bool rotate = Input.GetKeyDown(KeyCode.Space);
 
-		if (Input.GetKeyUp(KeyCode.DownArrow)) {
+        if (Input.GetKeyUp(KeyCode.RightArrow) || Input.GetKeyUp(KeyCode.LeftArrow)) {
 
-			movedImmediateVertical = false;
-			verticalTimer = 0;
-			buttonDownWaitTimerVirtical = 0;
-		}
+            movedImmediateHorizontal = false;
+            horizonalTimer = 0;
+            buttonDownWaitTimerHorizontal = 0;
+        }
 
-		if (left) { // move peice LEFT
+        if (Input.GetKeyUp(KeyCode.DownArrow)) {
 
-			MoveLeft();
-		}
-		 if (right) { // move peice Right
+            movedImmediateVertical = false;
+            verticalTimer = 0;
+            buttonDownWaitTimerVirtical = 0;
+        }
 
-			MoveRight();
-		}
+        if (left) { // move peice LEFT
 
-		if (rotate) { //Rotate the peice
+            MoveLeft();
+        }
+        if (right) { // move peice Right
 
-			Rotate();
-		}
-		if (down || Time.time - Fall >= FallSpeed) { // move peice Down by button and by time
+            MoveRight();
+        }
 
-			MoveDown();
-		}
-	}
+        if (rotate) { //Rotate the peice
 
-	void MoveRight() {
-		if (movedImmediateHorizontal) {
+            Rotate();
+        }
+        if (down || Time.time - Fall >= FallSpeed) { // move peice Down by button and by time
 
-			if (buttonDownWaitTimerHorizontal < buttonDownWaitMax) {
+            MoveDown();
+        }
+    }
 
-				buttonDownWaitTimerHorizontal += Time.deltaTime;
-				return;
-			}
+    void MoveRight() {
+        if (movedImmediateHorizontal) {
 
-			if (horizonalTimer < continuousHorizontalSpeed) {
-				horizonalTimer += Time.deltaTime;
-				return;
-			}
-		}
+            if (buttonDownWaitTimerHorizontal < buttonDownWaitMax) {
 
-		if (!movedImmediateHorizontal) {
-			movedImmediateHorizontal = true;
-		}
+                buttonDownWaitTimerHorizontal += Time.deltaTime;
+                return;
+            }
 
-		horizonalTimer = 0;
+            if (horizonalTimer < continuousHorizontalSpeed) {
+                horizonalTimer += Time.deltaTime;
+                return;
+            }
+        }
 
-		transform.position += new Vector3(1, 0, 0);
+        if (!movedImmediateHorizontal) {
+            movedImmediateHorizontal = true;
+        }
 
-		if (CheckIsValidPosition()) {
+        horizonalTimer = 0;
 
-			FindObjectOfType<Game>().UpdateGrid(this);
-			PlayMoveAudio();
+        transform.position += new Vector3(1, 0, 0);
 
-		}
-		else {
-			transform.position += new Vector3(-1, 0, 0);
-		}
-	}
+        if (CheckIsValidPosition()) {
 
-	void MoveLeft() {
-		if (movedImmediateHorizontal) {
+            FindObjectOfType<Game>().UpdateGrid(this);
+            PlayMoveAudio();
 
-			if (buttonDownWaitTimerHorizontal < buttonDownWaitMax) {
+        }
+        else {
+            transform.position += new Vector3(-1, 0, 0);
+        }
+    }
 
-				buttonDownWaitTimerHorizontal += Time.deltaTime;
-				return;
-			}
+    void MoveLeft() {
+        if (movedImmediateHorizontal) {
 
-			if (horizonalTimer < continuousHorizontalSpeed) {
-				horizonalTimer += Time.deltaTime;
-				return;
-			}
-		}
+            if (buttonDownWaitTimerHorizontal < buttonDownWaitMax) {
 
-		if (!movedImmediateHorizontal) {
-			movedImmediateHorizontal = true;
-		}
+                buttonDownWaitTimerHorizontal += Time.deltaTime;
+                return;
+            }
 
-		horizonalTimer = 0;
+            if (horizonalTimer < continuousHorizontalSpeed) {
+                horizonalTimer += Time.deltaTime;
+                return;
+            }
+        }
 
-		transform.position += new Vector3(-1, 0, 0);
+        if (!movedImmediateHorizontal) {
+            movedImmediateHorizontal = true;
+        }
 
-		if (CheckIsValidPosition()) {
+        horizonalTimer = 0;
 
-			FindObjectOfType<Game>().UpdateGrid(this);
-			PlayMoveAudio();
-		}
-		else {
+        transform.position += new Vector3(-1, 0, 0);
 
-			transform.position += new Vector3(1, 0, 0);
-		}
-	}
+        if (CheckIsValidPosition()) {
 
-	void MoveDown() {
-		bool down = Input.GetKey(KeyCode.DownArrow);
-		if (movedImmediateVertical) {
+            FindObjectOfType<Game>().UpdateGrid(this);
+            PlayMoveAudio();
+        }
+        else {
 
-			if (buttonDownWaitTimerVirtical < buttonDownWaitMax) {
+            transform.position += new Vector3(1, 0, 0);
+        }
+    }
 
-				buttonDownWaitTimerVirtical += Time.deltaTime;
-				return;
-			}
+    void MoveDown() {
+        bool down = Input.GetKey(KeyCode.DownArrow);
+        if (movedImmediateVertical) {
 
-			if (verticalTimer < continuousVerticalSpeed) {
-				verticalTimer += Time.deltaTime;
-				return;
-			}
-		}
+            if (buttonDownWaitTimerVirtical < buttonDownWaitMax) {
 
-		if (!movedImmediateVertical) {
-			movedImmediateVertical = true;
-		}
+                buttonDownWaitTimerVirtical += Time.deltaTime;
+                return;
+            }
 
-		verticalTimer = 0;
+            if (verticalTimer < continuousVerticalSpeed) {
+                verticalTimer += Time.deltaTime;
+                return;
+            }
+        }
 
-		transform.position += new Vector3(0, -1, 0);
+        if (!movedImmediateVertical) {
+            movedImmediateVertical = true;
+        }
 
-		Fall = Time.time;
+        verticalTimer = 0;
 
-		if (CheckIsValidPosition()) {
+        transform.position += new Vector3(0, -1, 0);
 
-			FindObjectOfType<Game>().UpdateGrid(this);
-			if (down) {
-				PlayMoveAudio();
+        Fall = Time.time;
 
-			}
-		}
-		else {
-			transform.position += new Vector3(0, 1, 0);
+        if (CheckIsValidPosition()) {
 
-			FindObjectOfType<Game>().DeleteRow();
+            FindObjectOfType<Game>().UpdateGrid(this);
+            if (down) {
+                PlayMoveAudio();
 
-			if (FindObjectOfType<Game>().CheckIsAboveGrid(this)) {
+            }
+        }
+        else {
+            transform.position += new Vector3(0, 1, 0);
 
-				FindObjectOfType<Game>().GameOver();
-			}
+            FindObjectOfType<Game>().DeleteRow();
 
-			enabled = false;
+            if (FindObjectOfType<Game>().CheckIsAboveGrid(this)) {
 
-			Game.currentScore += individualScore;
+                FindObjectOfType<Game>().GameOver();
+            }
 
-			PlayLandAudio();
-			//spawn next peice
-			FindObjectOfType<Game>().SpawnNextTetromino();
-		}
-	
-}
+            enabled = false;
 
-	void Rotate() {
-		if (allowRotation) {
-			if (limitRotation) {
-				if (transform.rotation.eulerAngles.z >= 90) {
+            Game.currentScore += individualScore;
 
-					transform.Rotate(0, 0, -90);
-				}
-				else {
+            PlayLandAudio();
+            //spawn next peice
+            FindObjectOfType<Game>().SpawnNextTetromino();
+        }
 
-					transform.Rotate(0, 0, 90);
-				}
-			}
-			else {
+    }
 
-				transform.Rotate(0, 0, 90);
-			}
+    void Rotate() {
+        if (allowRotation) {
+            if (limitRotation) {
+                if (transform.rotation.eulerAngles.z >= 90) {
 
-			if (CheckIsValidPosition()) {
+                    transform.Rotate(0, 0, -90);
+                }
+                else {
 
-				FindObjectOfType<Game>().UpdateGrid(this);
-				PlayRotateAudio();
+                    transform.Rotate(0, 0, 90);
+                }
+            }
+            else {
 
-			}
-			else {
-				if (limitRotation) {
-					if (transform.rotation.eulerAngles.z >= 90) {
-						transform.Rotate(0, 0, -90);
-					}
-					else {
-						transform.Rotate(0, 0, 90);
-					}
-				}
-				else {
-					transform.Rotate(0, 0, -90);
-				}
-			}
-		}
-	}
+                transform.Rotate(0, 0, 90);
+            }
 
+            if (CheckIsValidPosition()) {
 
-	void PlayMoveAudio() {
+                FindObjectOfType<Game>().UpdateGrid(this);
+                PlayRotateAudio();
 
-		audioSource.PlayOneShot(moveSound);
-	}
+            }
+            else {
+                if (limitRotation) {
+                    if (transform.rotation.eulerAngles.z >= 90) {
+                        transform.Rotate(0, 0, -90);
+                    }
+                    else {
+                        transform.Rotate(0, 0, 90);
+                    }
+                }
+                else {
+                    transform.Rotate(0, 0, -90);
+                }
+            }
+        }
+    }
 
-	void PlayRotateAudio() {
 
-		audioSource.PlayOneShot(rotateSound);
-	}
+    void PlayMoveAudio() {
 
-	void PlayLandAudio() {
+        audioSource.PlayOneShot(moveSound);
+    }
 
-		audioSource.PlayOneShot(landSound);
-	}
+    void PlayRotateAudio() {
 
-	bool CheckIsValidPosition() {
+        audioSource.PlayOneShot(rotateSound);
+    }
 
-		foreach (Transform mino in transform) {
+    void PlayLandAudio() {
 
-			Vector2 pos = FindObjectOfType<Game>().Round(mino.position);
-			if (FindObjectOfType<Game>().CheckIsInsideGrid(pos) == false) {
-				return false;
-			}
+        audioSource.PlayOneShot(landSound);
+    }
 
-			if (FindObjectOfType<Game>().GetTransformAtGridPosition(pos) != null && FindObjectOfType<Game>().GetTransformAtGridPosition(pos).parent != transform) {
+    bool CheckIsValidPosition() {
 
-				return false;
+        foreach (Transform mino in transform) {
 
-			}
-		}
-		return true;
-	}
+            Vector2 pos = FindObjectOfType<Game>().Round(mino.position);
+            if (FindObjectOfType<Game>().CheckIsInsideGrid(pos) == false) {
+                return false;
+            }
+
+            if (FindObjectOfType<Game>().GetTransformAtGridPosition(pos) != null && FindObjectOfType<Game>().GetTransformAtGridPosition(pos).parent != transform) {
+
+                return false;
+
+            }
+        }
+        return true;
+    }
 
 }

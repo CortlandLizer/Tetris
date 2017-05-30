@@ -6,345 +6,350 @@ using UnityEngine.UI;
 
 public class Game : MonoBehaviour {
 
-	public static int gridWidth = 10;
-	public static int gridHeight = 20;
+    public static int gridWidth = 10;
+    public static int gridHeight = 20;
 
-	public static Transform[,] grid = new Transform[gridWidth, gridHeight];
+    public static Transform[,] grid = new Transform[gridWidth, gridHeight];
 
+    public static bool startingAtLevelZero;
+    public static int startingLevel;
 
+    public int scoreOneLine = 40;
+    public int ScoreTwoLine = 100;
+    public int ScoreThreeLine = 300;
+    public int ScoreFourLine = 800;
 
-	public int scoreOneLine = 40;
-	public int ScoreTwoLine = 100;
-	public int ScoreThreeLine = 300;
-	public int ScoreFourLine = 800;
+    public int currentLevel = 0;
+    public int numLinesCleared = 0; //private?
 
-	public int currentLevel = 0;
-	public int numLinesCleared = 0; //private?
+    public static float fallSpeed = 1.0f;
 
-	public float fallSpeed = 1.0f;
+    public AudioClip clearedLinesSound;
 
-	public AudioClip clearedLinesSound;
-
-	public Text hud_score;
+    public Text hud_score;
     public Text hud_Level;
     public Text hud_Lines;
 
-	private int numberOfRowsThisTurn = 0;
+    private int numberOfRowsThisTurn = 0;
 
-	private AudioSource audioSource;
+    private AudioSource audioSource;
 
-	public static int currentScore = 0;
+    public static int currentScore = 0;
 
-	private GameObject previewTetromino;
-	private GameObject previewTetromino1;
-	private GameObject previewTetromino2;
-	private GameObject nextTetromino;
+    private GameObject previewTetromino;
+    private GameObject previewTetromino1;
+    private GameObject previewTetromino2;
+    private GameObject nextTetromino;
 
-	private bool gameStarted = false;
+    private bool gameStarted = false;
 
-	//starting point for Tetriminos
-	public static float startPositionX = 5.0f;
-	public static float startPositionY = 20.0f;
+    //starting point for Tetriminos
+    public static float startPositionX = 5.0f;
+    public static float startPositionY = 20.0f;
 
-	public static float previewXPositon = -3.5f;
-	public static int previewYPosition = 10;
+    public static float previewXPositon = -3.5f;
+    public static int previewYPosition = 10;
 
-	
 
-	private Vector2 previewTetrominoPostion = new Vector2(previewXPositon, previewYPosition); //make float and in vars and add some later
-	private Vector2 previewTetrominoPostion1 = new Vector2(previewXPositon, previewYPosition+4);
-	private Vector2 previewTetrominoPostion2 = new Vector2(previewXPositon, previewYPosition+8);
 
-	// Use this for initialization
-	void Start() {
-		SpawnNextTetromino();
-		audioSource = GetComponent<AudioSource>();
-		//numLinesCleared = currentLevel * 10;
-	}
+    private Vector2 previewTetrominoPostion = new Vector2(previewXPositon, previewYPosition); //make float and in vars and add some later
+    private Vector2 previewTetrominoPostion1 = new Vector2(previewXPositon, previewYPosition + 4);
+    private Vector2 previewTetrominoPostion2 = new Vector2(previewXPositon, previewYPosition + 8);
 
-	void Update() {
+    // Use this for initialization
+    void Start() {
 
-		UpdateScore();
+        currentLevel = startingLevel;
 
-		UpdateUI();
-		UpdateLevel();
-		UpdateSpeed();
-	}
+        SpawnNextTetromino();
+        audioSource = GetComponent<AudioSource>();
+        //numLinesCleared = currentLevel * 10;
+    }
 
-	void UpdateLevel() {
+    void Update() {
 
-		currentLevel = numLinesCleared / 10;
-       // Debug.Log("Current Level : " + currentLevel);
-	}
+        UpdateScore();
 
-	void UpdateSpeed() {
+        UpdateUI();
+        UpdateLevel();
+        UpdateSpeed();
+    }
 
-		fallSpeed = 1.0f - ((float)currentLevel * 0.1f);
+    void UpdateLevel() {
+        if ((startingAtLevelZero ==true)  ||  ( startingAtLevelZero== false && numLinesCleared /10 > startingLevel)) {
+            currentLevel = numLinesCleared / 10;
+            // Debug.Log("Current Level : " + currentLevel);
+        }
+    }
+
+    void UpdateSpeed() {
+
+        fallSpeed = 1.0f - ((float)currentLevel * 0.1f);
         //Debug.Log("Fall Speed :" + fallSpeed);
-	}
+    }
 
-	public void UpdateUI() {
+    public void UpdateUI() {
 
-		hud_score.text = currentScore.ToString();
+        hud_score.text = currentScore.ToString();
         hud_Level.text = currentLevel.ToString();
         hud_Lines.text = numLinesCleared.ToString();
-	}
-	public void UpdateScore() {
+    }
+    public void UpdateScore() {
 
-		if (numberOfRowsThisTurn > 0) {
+        if (numberOfRowsThisTurn > 0) {
 
-			if (numberOfRowsThisTurn == 1) {
+            if (numberOfRowsThisTurn == 1) {
 
-				ClearedOneLine();
+                ClearedOneLine();
 
-			}
-			else if (numberOfRowsThisTurn == 2) {
+            }
+            else if (numberOfRowsThisTurn == 2) {
 
-				ClearedTwoLines();
+                ClearedTwoLines();
 
-			}
-			else if (numberOfRowsThisTurn == 3) {
+            }
+            else if (numberOfRowsThisTurn == 3) {
 
-				ClearedThreeLines();
+                ClearedThreeLines();
 
-			}
-			else if (numberOfRowsThisTurn == 4) {
+            }
+            else if (numberOfRowsThisTurn == 4) {
 
-				ClearedFourLines();
-			}
+                ClearedFourLines();
+            }
 
-			numberOfRowsThisTurn = 0;
+            numberOfRowsThisTurn = 0;
 
-			PlayLineClearedSound();
-		}
+            PlayLineClearedSound();
+        }
 
-	}
+    }
 
-	public void ClearedOneLine() {
+    public void ClearedOneLine() {
 
-		currentScore += scoreOneLine + (currentLevel*20);
-		numLinesCleared++;
-	}
+        currentScore += scoreOneLine + (currentLevel * 20); //can chan num later to make points multiplier variable 
+        numLinesCleared++;
+    }
 
-	public void ClearedTwoLines() {
+    public void ClearedTwoLines() {
 
-		currentScore += ScoreTwoLine + (currentLevel * 25);
-		numLinesCleared += 2;
-	}
+        currentScore += ScoreTwoLine + (currentLevel * 25);
+        numLinesCleared += 2;
+    }
 
-	public void ClearedThreeLines() {
+    public void ClearedThreeLines() {
 
-		currentScore += ScoreThreeLine + (currentLevel * 30);
-		numLinesCleared += 3;
-	}
+        currentScore += ScoreThreeLine + (currentLevel * 30);
+        numLinesCleared += 3;
+    }
 
-	public void ClearedFourLines() {
+    public void ClearedFourLines() {
 
-		currentScore += ScoreFourLine + (currentLevel * 45);
-		numLinesCleared += 4;
-	}
+        currentScore += ScoreFourLine + (currentLevel * 45);
+        numLinesCleared += 4;
+    }
 
-	public void PlayLineClearedSound() {
+    public void PlayLineClearedSound() {
 
-		audioSource.PlayOneShot(clearedLinesSound);
-	}
+        audioSource.PlayOneShot(clearedLinesSound);
+    }
 
-	public bool CheckIsAboveGrid(Tetromino tetromino) {
+    public bool CheckIsAboveGrid(Tetromino tetromino) {
 
-		for (int x = 0; x < gridWidth; ++x) {
+        for (int x = 0; x < gridWidth; ++x) {
 
-			foreach (Transform mino in tetromino.transform) {
+            foreach (Transform mino in tetromino.transform) {
 
-				Vector2 pos = Round(mino.position);
+                Vector2 pos = Round(mino.position);
 
-				if (pos.y > gridHeight - 1) {
-					return true;
-				}
+                if (pos.y > gridHeight - 1) {
+                    return true;
+                }
 
-			}
-		}
+            }
+        }
 
-		return false;
-	}
+        return false;
+    }
 
 
-	public bool IsFullRowAt(int y) {
-		for (int x = 0; x < gridWidth; ++x) {
-			if (grid[x, y] == null) {
+    public bool IsFullRowAt(int y) {
+        for (int x = 0; x < gridWidth; ++x) {
+            if (grid[x, y] == null) {
 
-				return false;
-			}
-		}
+                return false;
+            }
+        }
 
-		// since found full row increment the full row var.
-		numberOfRowsThisTurn++;
+        // since found full row increment the full row var.
+        numberOfRowsThisTurn++;
 
-		return true;
-	}
+        return true;
+    }
 
-	public void DeleatMinoAt(int y) {
-		for (int x = 0; x < gridWidth; ++x) {
+    public void DeleatMinoAt(int y) {
+        for (int x = 0; x < gridWidth; ++x) {
 
-			Destroy(grid[x, y].gameObject);
+            Destroy(grid[x, y].gameObject);
 
-			grid[x, y] = null;
-		}
-	}
+            grid[x, y] = null;
+        }
+    }
 
-	public void MoveRowDown(int y) {
-		for (int x = 0; x < gridWidth; ++x) {
-			if (grid[x, y] != null) {
+    public void MoveRowDown(int y) {
+        for (int x = 0; x < gridWidth; ++x) {
+            if (grid[x, y] != null) {
 
-				grid[x, y - 1] = grid[x, y];
+                grid[x, y - 1] = grid[x, y];
 
-				grid[x, y] = null;
+                grid[x, y] = null;
 
-				grid[x, y - 1].position += new Vector3(0, -1, 0);
-			}
-		}
-	}
+                grid[x, y - 1].position += new Vector3(0, -1, 0);
+            }
+        }
+    }
 
-	public void MoveAllRowsDown(int y) {
+    public void MoveAllRowsDown(int y) {
 
-		for (int i = y; i < gridHeight; ++i) {
+        for (int i = y; i < gridHeight; ++i) {
 
-			MoveRowDown(i);
-		}
-	}
+            MoveRowDown(i);
+        }
+    }
 
-	public void DeleteRow() {
-		for (int y = 0; y < gridHeight; ++y) {
+    public void DeleteRow() {
+        for (int y = 0; y < gridHeight; ++y) {
 
-			if (IsFullRowAt(y)) {
+            if (IsFullRowAt(y)) {
 
-				DeleatMinoAt(y);
+                DeleatMinoAt(y);
 
-				MoveAllRowsDown(y + 1);
-				--y;
-			}
-		}
-	}
+                MoveAllRowsDown(y + 1);
+                --y;
+            }
+        }
+    }
 
-	public void UpdateGrid(Tetromino tetromino) {
+    public void UpdateGrid(Tetromino tetromino) {
 
-		for (int y = 0; y < gridHeight; ++y) {
+        for (int y = 0; y < gridHeight; ++y) {
 
-			for (int x = 0; x < gridWidth; ++x) {
-				if (grid[x, y] != null) {
+            for (int x = 0; x < gridWidth; ++x) {
+                if (grid[x, y] != null) {
 
-					if (grid[x, y].parent == tetromino.transform) {
+                    if (grid[x, y].parent == tetromino.transform) {
 
-						grid[x, y] = null;
-					}
-				}
-			}
-		}
-		foreach (Transform mino in tetromino.transform) {
-			Vector2 pos = Round(mino.position);
+                        grid[x, y] = null;
+                    }
+                }
+            }
+        }
+        foreach (Transform mino in tetromino.transform) {
+            Vector2 pos = Round(mino.position);
 
-			if (pos.y < gridHeight) {
-				grid[(int)pos.x, (int)pos.y] = mino;
-			}
-		}
-	}
+            if (pos.y < gridHeight) {
+                grid[(int)pos.x, (int)pos.y] = mino;
+            }
+        }
+    }
 
-	public Transform GetTransformAtGridPosition(Vector2 pos) {
-		if (pos.y > gridHeight - 1) {
-			return null;
-		}
-		else {
-			return grid[(int)pos.x, (int)pos.y];
-		}
-	}
+    public Transform GetTransformAtGridPosition(Vector2 pos) {
+        if (pos.y > gridHeight - 1) {
+            return null;
+        }
+        else {
+            return grid[(int)pos.x, (int)pos.y];
+        }
+    }
 
-	public void SpawnNextTetromino() {
+    public void SpawnNextTetromino() {
 
-		if (!gameStarted) {
+        if (!gameStarted) {
 
-			gameStarted = true;
+            gameStarted = true;
 
-			nextTetromino = (GameObject)Instantiate(Resources.Load(GetRandomTetromino(), typeof(GameObject)), new Vector2(startPositionX, startPositionY), Quaternion.identity);
+            nextTetromino = (GameObject)Instantiate(Resources.Load(GetRandomTetromino(), typeof(GameObject)), new Vector2(startPositionX, startPositionY), Quaternion.identity);
 
-			previewTetromino = (GameObject)Instantiate(Resources.Load(GetRandomTetromino(), typeof(GameObject)),previewTetrominoPostion, Quaternion.identity);
-			previewTetromino.GetComponent<Tetromino>().enabled = false;
+            previewTetromino = (GameObject)Instantiate(Resources.Load(GetRandomTetromino(), typeof(GameObject)), previewTetrominoPostion, Quaternion.identity);
+            previewTetromino.GetComponent<Tetromino>().enabled = false;
 
 
-			previewTetromino1 = (GameObject)Instantiate(Resources.Load(GetRandomTetromino(), typeof(GameObject)), previewTetrominoPostion1, Quaternion.identity);
-			previewTetromino1.GetComponent<Tetromino>().enabled = false;
+            previewTetromino1 = (GameObject)Instantiate(Resources.Load(GetRandomTetromino(), typeof(GameObject)), previewTetrominoPostion1, Quaternion.identity);
+            previewTetromino1.GetComponent<Tetromino>().enabled = false;
 
-			previewTetromino2 = (GameObject)Instantiate(Resources.Load(GetRandomTetromino(), typeof(GameObject)), previewTetrominoPostion2, Quaternion.identity);
-			previewTetromino2.GetComponent<Tetromino>().enabled = false;
+            previewTetromino2 = (GameObject)Instantiate(Resources.Load(GetRandomTetromino(), typeof(GameObject)), previewTetrominoPostion2, Quaternion.identity);
+            previewTetromino2.GetComponent<Tetromino>().enabled = false;
 
-		}
-		else {
-			previewTetromino.transform.localPosition = new Vector2(startPositionX, startPositionY);
-			previewTetromino1.transform.localPosition = previewTetrominoPostion;//2
-			previewTetromino2.transform.localPosition = previewTetrominoPostion1;//3
+        }
+        else {
+            previewTetromino.transform.localPosition = new Vector2(startPositionX, startPositionY);
+            previewTetromino1.transform.localPosition = previewTetrominoPostion;//2
+            previewTetromino2.transform.localPosition = previewTetrominoPostion1;//3
 
-			nextTetromino = previewTetromino;//1
-			nextTetromino.GetComponent<Tetromino>().enabled = true;//1
+            nextTetromino = previewTetromino;//1
+            nextTetromino.GetComponent<Tetromino>().enabled = true;//1
 
-			previewTetromino = previewTetromino1;//2
-			previewTetromino1 = previewTetromino2;//3
-			//previewTetromino.GetComponent<Tetromino>().enabled = true;//1
+            previewTetromino = previewTetromino1;//2
+            previewTetromino1 = previewTetromino2;//3
+                                                  //previewTetromino.GetComponent<Tetromino>().enabled = true;//1
 
-			//previewTetromino = (GameObject)Instantiate(Resources.Load(GetRandomTetromino(), typeof(GameObject)), previewTetrominoPostion, Quaternion.identity);//1
-			//previewTetromino.GetComponent<Tetromino>().enabled = false;//1
+            //previewTetromino = (GameObject)Instantiate(Resources.Load(GetRandomTetromino(), typeof(GameObject)), previewTetrominoPostion, Quaternion.identity);//1
+            //previewTetromino.GetComponent<Tetromino>().enabled = false;//1
 
-			//previewTetromino1 = (GameObject)Instantiate(Resources.Load(GetRandomTetromino(), typeof(GameObject)), previewTetrominoPostion1, Quaternion.identity);//2
-			//previewTetromino1.GetComponent<Tetromino>().enabled = false;//2
+            //previewTetromino1 = (GameObject)Instantiate(Resources.Load(GetRandomTetromino(), typeof(GameObject)), previewTetrominoPostion1, Quaternion.identity);//2
+            //previewTetromino1.GetComponent<Tetromino>().enabled = false;//2
 
-			previewTetromino2 = (GameObject)Instantiate(Resources.Load(GetRandomTetromino(), typeof(GameObject)), previewTetrominoPostion2, Quaternion.identity); //3
-			previewTetromino2.GetComponent<Tetromino>().enabled = false;//3
-		}
+            previewTetromino2 = (GameObject)Instantiate(Resources.Load(GetRandomTetromino(), typeof(GameObject)), previewTetrominoPostion2, Quaternion.identity); //3
+            previewTetromino2.GetComponent<Tetromino>().enabled = false;//3
+        }
 
-	}
+    }
 
-	public bool CheckIsInsideGrid(Vector2 pos) {
+    public bool CheckIsInsideGrid(Vector2 pos) {
 
-		return ((int)pos.x >= 0 && (int)pos.x < gridWidth && (int)pos.y >= 0);
-	}
+        return ((int)pos.x >= 0 && (int)pos.x < gridWidth && (int)pos.y >= 0);
+    }
 
-	public Vector2 Round(Vector2 pos) {
+    public Vector2 Round(Vector2 pos) {
 
-		return new Vector2(Mathf.Round(pos.x), Mathf.Round(pos.y));
-	}
+        return new Vector2(Mathf.Round(pos.x), Mathf.Round(pos.y));
+    }
 
-	string GetRandomTetromino() {
-		int randomTetromino = Random.Range(1, 8);
+    string GetRandomTetromino() {
+        int randomTetromino = Random.Range(1, 8);
 
-		string randomeTetrominoName = "PreFabs/Tetromino_T";
+        string randomeTetrominoName = "PreFabs/Tetromino_T";
 
-		switch (randomTetromino) {
-			case 1:
-				randomeTetrominoName = "PreFabs/Tetromino_T";
-				break;
-			case 2:
-				randomeTetrominoName = "PreFabs/Tetromino_I";
-				break;
-			case 3:
-				randomeTetrominoName = "PreFabs/Tetromino_B";
-				break;
-			case 4:
-				randomeTetrominoName = "PreFabs/Tetromino_J";
-				break;
-			case 5:
-				randomeTetrominoName = "PreFabs/Tetromino_L";
-				break;
-			case 6:
-				randomeTetrominoName = "PreFabs/Tetromino_S";
-				break;
-			case 7:
-				randomeTetrominoName = "PreFabs/Tetromino_Z";
-				break;
-		}
-		return randomeTetrominoName;
-	}
+        switch (randomTetromino) {
+            case 1:
+                randomeTetrominoName = "PreFabs/Tetromino_T";
+                break;
+            case 2:
+                randomeTetrominoName = "PreFabs/Tetromino_I";
+                break;
+            case 3:
+                randomeTetrominoName = "PreFabs/Tetromino_B";
+                break;
+            case 4:
+                randomeTetrominoName = "PreFabs/Tetromino_J";
+                break;
+            case 5:
+                randomeTetrominoName = "PreFabs/Tetromino_L";
+                break;
+            case 6:
+                randomeTetrominoName = "PreFabs/Tetromino_S";
+                break;
+            case 7:
+                randomeTetrominoName = "PreFabs/Tetromino_Z";
+                break;
+        }
+        return randomeTetrominoName;
+    }
 
-	public void GameOver() {
+    public void GameOver() {
 
-		SceneManager.LoadScene("Game Over");
-		// was Application.LoadLevel(string) but thats depricaated
-	}
+        SceneManager.LoadScene("Game Over");
+        // was Application.LoadLevel(string) but thats depricaated
+    }
 }
 

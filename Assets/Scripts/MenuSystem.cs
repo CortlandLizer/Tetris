@@ -5,9 +5,9 @@ using UnityEngine.SceneManagement;
 
 public class MenuSystem : MonoBehaviour {
 
-	public void PlayAgain () {
+    public void PlayAgain() {
 
-      
+
         SceneManager.LoadScene("Level");
         // was Application.LoadLevel(string) but thats depricaated
     }
