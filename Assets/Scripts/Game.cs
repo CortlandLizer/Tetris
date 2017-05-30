@@ -8,11 +8,9 @@ public class Game : MonoBehaviour {
 
 	public static int gridWidth = 10;
 	public static int gridHeight = 20;
+
 	public static Transform[,] grid = new Transform[gridWidth, gridHeight];
 
-	//starting point for Tetriminos
-	public static float startPositionX = 5.0f;
-	public static float startPositionY = 20.0f;
 
 
 	public int scoreOneLine = 40;
@@ -20,12 +18,17 @@ public class Game : MonoBehaviour {
 	public int ScoreThreeLine = 300;
 	public int ScoreFourLine = 800;
 
-	private int numberOfRowsThisTurn = 0;
+	//public float fallSpeed = 1;
+
+	public AudioClip clearedLinesSound;
+
 	public Text hud_score;
-	public static int currentScore = 0;
+
+	private int numberOfRowsThisTurn = 0;
 
 	private AudioSource audioSource;
-	public AudioClip clearedLinesSound;
+
+	public static int currentScore = 0;
 
 	private GameObject previewTetromino;
 	private GameObject previewTetromino1;
@@ -34,8 +37,14 @@ public class Game : MonoBehaviour {
 
 	private bool gameStarted = false;
 
+	//starting point for Tetriminos
+	public static float startPositionX = 5.0f;
+	public static float startPositionY = 20.0f;
+
 	public static float previewXPositon = -3.5f;
 	public static int previewYPosition = 10;
+
+	
 
 	private Vector2 previewTetrominoPostion = new Vector2(previewXPositon, previewYPosition); //make float and in vars and add some later
 	private Vector2 previewTetrominoPostion1 = new Vector2(previewXPositon, previewYPosition+4);

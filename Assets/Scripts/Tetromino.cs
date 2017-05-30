@@ -10,10 +10,11 @@ public class Tetromino : MonoBehaviour {
 
 
 	float Fall = 0;
-	public float FallSpeed = 1;
+	private float FallSpeed = 1; //see public fallSpeed
 	public bool allowRotation = true;
 	public bool limitRotation = false;
 
+	//public float fallSpeed = 1;
 
 	public AudioClip moveSound;
 	public AudioClip rotateSound;
@@ -23,7 +24,10 @@ public class Tetromino : MonoBehaviour {
 	public float continuousVerticalSpeed = 0.05f;  //speed to move when down arrow i pressed
 	public float continuousHorizontalSpeed = 0.1f; // speed hat left or right moves        0.1f is default make smaller for faster (.01 is to fast .05 is to slow) [BEST RANGE][   ]
 	public float buttonDownWaitMax = 0.2f; // how long to wait before tetrimion recognizes butto is held 
-	public float buttonDownWaitTimer = 0;
+
+	public float buttonDownWaitTimerHorizontal = 0; //probably shoul be privat b/c there is no reason to change this ...also it cant really be changed
+	public float buttonDownWaitTimerVirtical = 0; //probably shoul be privat b/c there is no reason to change this ...also it cant really be changed
+
 
 	private bool movedImmediateHorizontal = false;
 	private bool movedImmediateVertical = false;
@@ -37,7 +41,10 @@ public class Tetromino : MonoBehaviour {
 	private AudioSource audioSource;
 	// Use this for initialization
 	void Start() {
+
 		audioSource = GetComponent<AudioSource>();
+
+		//fallSpeed = GameObject.Find("GameScript").GetComponent<Game>().fallSpeed;
 	}
 
 	// Update is called once per frame
@@ -69,12 +76,18 @@ public class Tetromino : MonoBehaviour {
 		bool up = Input.GetKeyDown(KeyCode.UpArrow);
 		bool rotate = Input.GetKeyDown(KeyCode.Space);
 
-		if (Input.GetKeyUp(KeyCode.RightArrow) || Input.GetKeyUp(KeyCode.LeftArrow) || Input.GetKeyUp(KeyCode.DownArrow)) {
-			horizonalTimer = 0;
-			verticalTimer = 0;
-			buttonDownWaitTimer = 0;
+		if (Input.GetKeyUp(KeyCode.RightArrow) || Input.GetKeyUp(KeyCode.LeftArrow)) {
+
 			movedImmediateHorizontal = false;
+			horizonalTimer = 0;
+			buttonDownWaitTimerHorizontal = 0;			
+		}
+
+		if (Input.GetKeyUp(KeyCode.DownArrow)) {
+
 			movedImmediateVertical = false;
+			verticalTimer = 0;
+			buttonDownWaitTimerVirtical = 0;
 		}
 
 		if (left) { // move peice LEFT
@@ -99,9 +112,9 @@ public class Tetromino : MonoBehaviour {
 	void MoveRight() {
 		if (movedImmediateHorizontal) {
 
-			if (buttonDownWaitTimer < buttonDownWaitMax) {
+			if (buttonDownWaitTimerHorizontal < buttonDownWaitMax) {
 
-				buttonDownWaitTimer += Time.deltaTime;
+				buttonDownWaitTimerHorizontal += Time.deltaTime;
 				return;
 			}
 
@@ -133,9 +146,9 @@ public class Tetromino : MonoBehaviour {
 	void MoveLeft() {
 		if (movedImmediateHorizontal) {
 
-			if (buttonDownWaitTimer < buttonDownWaitMax) {
+			if (buttonDownWaitTimerHorizontal < buttonDownWaitMax) {
 
-				buttonDownWaitTimer += Time.deltaTime;
+				buttonDownWaitTimerHorizontal += Time.deltaTime;
 				return;
 			}
 
@@ -168,9 +181,9 @@ public class Tetromino : MonoBehaviour {
 		bool down = Input.GetKey(KeyCode.DownArrow);
 		if (movedImmediateVertical) {
 
-			if (buttonDownWaitTimer < buttonDownWaitMax) {
+			if (buttonDownWaitTimerVirtical < buttonDownWaitMax) {
 
-				buttonDownWaitTimer += Time.deltaTime;
+				buttonDownWaitTimerVirtical += Time.deltaTime;
 				return;
 			}
 
