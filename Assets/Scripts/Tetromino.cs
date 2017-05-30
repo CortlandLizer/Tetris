@@ -82,6 +82,8 @@ public class Tetromino : MonoBehaviour {
         bool up = Input.GetKeyDown(KeyCode.UpArrow);
         bool rotate = Input.GetKeyDown(KeyCode.Space);
 
+
+
         if (Input.GetKeyUp(KeyCode.RightArrow) || Input.GetKeyUp(KeyCode.LeftArrow)) {
 
             movedImmediateHorizontal = false;
@@ -228,6 +230,7 @@ public class Tetromino : MonoBehaviour {
             }
 
             enabled = false;
+            tag = "Untagged";
 
             Game.currentScore += individualScore;
 
