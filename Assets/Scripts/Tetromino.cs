@@ -10,11 +10,11 @@ public class Tetromino : MonoBehaviour {
 
 
 	float Fall = 0;
-	private float FallSpeed = 1; //see public fallSpeed
+	private float FallSpeed; //see public fallSpeed
 	public bool allowRotation = true;
 	public bool limitRotation = false;
 
-	//public float fallSpeed = 1;
+
 
 	public AudioClip moveSound;
 	public AudioClip rotateSound;
@@ -25,8 +25,8 @@ public class Tetromino : MonoBehaviour {
 	public float continuousHorizontalSpeed = 0.1f; // speed hat left or right moves        0.1f is default make smaller for faster (.01 is to fast .05 is to slow) [BEST RANGE][   ]
 	public float buttonDownWaitMax = 0.2f; // how long to wait before tetrimion recognizes butto is held 
 
-	public float buttonDownWaitTimerHorizontal = 0; //probably shoul be privat b/c there is no reason to change this ...also it cant really be changed
-	public float buttonDownWaitTimerVirtical = 0; //probably shoul be privat b/c there is no reason to change this ...also it cant really be changed
+	public float buttonDownWaitTimerHorizontal = 0; //probably shoul be private b/c there is no reason to change this ...also it cant really be changed
+	public float buttonDownWaitTimerVirtical = 0; //probably shoul be private b/c there is no reason to change this ...also it cant really be changed
 
 
 	private bool movedImmediateHorizontal = false;
@@ -44,7 +44,7 @@ public class Tetromino : MonoBehaviour {
 
 		audioSource = GetComponent<AudioSource>();
 
-		//fallSpeed = GameObject.Find("GameScript").GetComponent<Game>().fallSpeed;
+		FallSpeed = GameObject.Find("GameScript").GetComponent<Game>().fallSpeed; //this might be a good way to change controls in a menu 
 	}
 
 	// Update is called once per frame

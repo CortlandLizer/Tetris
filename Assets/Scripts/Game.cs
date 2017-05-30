@@ -18,11 +18,16 @@ public class Game : MonoBehaviour {
 	public int ScoreThreeLine = 300;
 	public int ScoreFourLine = 800;
 
-	//public float fallSpeed = 1;
+	public int currentLevel = 0;
+	public int numLinesCleared = 0; //private?
+
+	public float fallSpeed = 1.0f;
 
 	public AudioClip clearedLinesSound;
 
 	public Text hud_score;
+    public Text hud_Level;
+    public Text hud_Lines;
 
 	private int numberOfRowsThisTurn = 0;
 
@@ -54,6 +59,7 @@ public class Game : MonoBehaviour {
 	void Start() {
 		SpawnNextTetromino();
 		audioSource = GetComponent<AudioSource>();
+		//numLinesCleared = currentLevel * 10;
 	}
 
 	void Update() {
@@ -61,11 +67,27 @@ public class Game : MonoBehaviour {
 		UpdateScore();
 
 		UpdateUI();
+		UpdateLevel();
+		UpdateSpeed();
+	}
+
+	void UpdateLevel() {
+
+		currentLevel = numLinesCleared / 10;
+       // Debug.Log("Current Level : " + currentLevel);
+	}
+
+	void UpdateSpeed() {
+
+		fallSpeed = 1.0f - ((float)currentLevel * 0.1f);
+        //Debug.Log("Fall Speed :" + fallSpeed);
 	}
 
 	public void UpdateUI() {
 
 		hud_score.text = currentScore.ToString();
+        hud_Level.text = currentLevel.ToString();
+        hud_Lines.text = numLinesCleared.ToString();
 	}
 	public void UpdateScore() {
 
@@ -100,22 +122,26 @@ public class Game : MonoBehaviour {
 
 	public void ClearedOneLine() {
 
-		currentScore += scoreOneLine;
+		currentScore += scoreOneLine + (currentLevel*20);
+		numLinesCleared++;
 	}
 
 	public void ClearedTwoLines() {
 
-		currentScore += ScoreTwoLine;
+		currentScore += ScoreTwoLine + (currentLevel * 25);
+		numLinesCleared += 2;
 	}
 
 	public void ClearedThreeLines() {
 
-		currentScore += ScoreThreeLine;
+		currentScore += ScoreThreeLine + (currentLevel * 30);
+		numLinesCleared += 3;
 	}
 
 	public void ClearedFourLines() {
 
-		currentScore += ScoreFourLine;
+		currentScore += ScoreFourLine + (currentLevel * 45);
+		numLinesCleared += 4;
 	}
 
 	public void PlayLineClearedSound() {
